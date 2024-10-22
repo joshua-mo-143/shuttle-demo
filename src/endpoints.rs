@@ -4,9 +4,11 @@ use axum::{
     response::IntoResponse,
     Json,
 };
+use serde::Deserialize;
 
 use crate::{
     database::{Database, Note},
+    search::{FetchParams, Tantivy},
     state::AppState,
 };
 
@@ -20,7 +22,7 @@ pub async fn fetch_notes(
 }
 
 pub async fn fetch_note_by_id(
-    State(state): State<Database>,
+    State(db): State<Database>,
     Path(id): Path<i64>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
     match db.fetch_note_by_id(id).await {
@@ -29,5 +31,38 @@ pub async fn fetch_note_by_id(
     }
 }
 
-pub async fn create_note(State(state): State<AppState>, Json(json): Json<Note>) {}
-pub async fn delete_note() {}
+pub async fn create_note(
+    State(mut state): State<AppState>,
+    Json(json): Json<Note>,
+) -> Result<impl IntoResponse, impl IntoResponse> {
+    let note = match state.db.create_note(json.body).await {
+        Ok(note) => note,
+        Err(e) => return Err((StatusCode::INTERNAL_SERVER_ERROR, e.to_string())),
+    };
+
+    if let Err(e) = state.search.create_doc(note) {
+        return Err((StatusCode::INTERNAL_SERVER_ERROR, e.to_string()));
+    };
+
+    Ok(StatusCode::CREATED)
+}
+
+#[derive(Clone, Deserialize)]
+pub struct QueryString {
+    query: String,
+}
+
+pub async fn search(
+    State(search): State<Tantivy>,
+    Json(json): Json<QueryString>,
+) -> Result<impl IntoResponse, impl IntoResponse> {
+    let params = FetchParams::builder().query(json.query).build();
+    match search.fetch_docs(params) {
+        Ok(note) => Ok(Json(note)),
+        Err(e) => Err((StatusCode::INTERNAL_SERVER_ERROR, e.to_string())),
+    }
+}
+
+pub async fn health_check() -> &'static str {
+    "It works!"
+}

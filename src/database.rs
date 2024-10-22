@@ -15,7 +15,7 @@ pub struct Note {
 
 impl Database {
     pub async fn new(conn_string: &str) -> Self {
-        let db = PgPool::connect(&conn_string)
+        let db = PgPool::connect(conn_string)
             .await
             .expect("to connect to the database");
 
@@ -45,12 +45,12 @@ impl Database {
         Ok(query)
     }
 
-    pub async fn delete_note_by_id(&self, id: i64) -> Result<(), sqlx::Error> {
-        sqlx::query("DELETE FROM NOTES where id = $1")
-            .bind(id)
-            .execute(&self.db)
+    pub async fn create_note(&self, body: String) -> Result<Note, sqlx::Error> {
+        let query: Note = sqlx::query_as("INSERT INTO notes (body) VALUES ($1) returning *")
+            .bind(body)
+            .fetch_one(&self.db)
             .await?;
 
-        Ok(())
+        Ok(query)
     }
 }

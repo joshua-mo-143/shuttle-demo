@@ -4,8 +4,8 @@ use crate::{database::Database, search::Tantivy};
 
 #[derive(Clone)]
 pub struct AppState {
-    db: Database,
-    search: Tantivy,
+    pub db: Database,
+    pub search: Tantivy,
 }
 
 impl AppState {

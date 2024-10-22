@@ -99,7 +99,7 @@ impl Tantivy {
 }
 
 fn create_tantivy_query(query: String) -> String {
-    let str = query.split(" ").collect::<Vec<&str>>();
+    let str = query.split(' ').collect::<Vec<&str>>();
 
     let mut string = String::new();
 
@@ -169,5 +169,11 @@ impl From<FetchParamsBuilder> for FetchParams {
         let results_num = params.results_num.unwrap_or(5);
 
         Self { query, results_num }
+    }
+}
+
+impl Default for FetchParamsBuilder {
+    fn default() -> Self {
+        Self::new()
     }
 }
