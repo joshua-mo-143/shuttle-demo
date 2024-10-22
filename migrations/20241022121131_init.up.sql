@@ -1,0 +1,5 @@
+-- Add up migration script here
+CREATE TABLE IF NOT EXISTS notes (
+    int BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    body VARCHAR NOT NULL
+);

@@ -1,0 +1,11 @@
+[package]
+name = "shuttle-demo"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum = "0.7.4"
+serde = { version = "1.0.211", features = ["derive"] }
+sqlx = { version = "0.8.2", features = ["runtime-tokio-rustls", "postgres", "macros"] }
+tantivy = "0.22.0"
+tokio = { version = "1.28.2", features = ["macros", "rt-multi-thread"] }
