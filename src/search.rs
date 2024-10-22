@@ -104,7 +104,7 @@ fn create_tantivy_query(query: String) -> String {
     let mut string = String::new();
 
     for (idx, search_term) in str.iter().enumerate() {
-        let search_terms = format!("(title:{search_term} OR description:{search_term})");
+        let search_terms = format!("(body:{search_term})");
         string.push_str(&search_terms);
         if idx < str.len() - 1 {
             string.push_str(" AND ")

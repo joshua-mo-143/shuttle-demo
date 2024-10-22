@@ -31,9 +31,14 @@ pub async fn fetch_note_by_id(
     }
 }
 
+#[derive(Deserialize)]
+pub struct NewNote {
+    body: String,
+}
+
 pub async fn create_note(
     State(mut state): State<AppState>,
-    Json(json): Json<Note>,
+    Json(json): Json<NewNote>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
     let note = match state.db.create_note(json.body).await {
         Ok(note) => note,

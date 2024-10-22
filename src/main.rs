@@ -22,7 +22,7 @@ async fn main() {
             "/notes",
             get(endpoints::fetch_notes).post(endpoints::create_note),
         )
-        .route("/note/:id", post(endpoints::fetch_note_by_id))
+        .route("/note/:id", get(endpoints::fetch_note_by_id))
         .with_state(state);
 
     let tcp = TcpListener::bind("0.0.0.0:8000")

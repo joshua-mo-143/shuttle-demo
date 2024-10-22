@@ -11,9 +11,10 @@ pub struct AppState {
 impl AppState {
     pub async fn new(conn_string: String) -> Self {
         let db = Database::new(&conn_string).await;
+        db.seed().await.expect("to carry out migrations");
 
         let mut search = Tantivy::new().expect("create a new Tantivy instance");
-        search.seed(&db).await.unwrap();
+        search.seed(&db).await.expect("to seed the search docs");
         Self { db, search }
     }
 }
